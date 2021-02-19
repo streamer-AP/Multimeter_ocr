@@ -1,0 +1,59 @@
+{
+    "camera": {
+        "file_path": 0,
+        "width": 1280,
+        "height": 720,
+        "fps": 5,
+        "params": "calibration.npy",
+        "origin_roi": [
+            200,
+            0,
+            1080,
+            720
+        ],
+        "calibrated_roi": [
+            50,
+            50,
+            700,
+            350
+        ]
+    },
+    "cropper": {
+        "masks": {
+            "A": [
+                {
+                    "img_path": "data/masks/A.png",
+                    "mask_path": "data/masks/A.pkl"
+                },
+                {
+                    "img_path": "data/masks/A_2.png",
+                    "mask_path": "data/masks/A_2.pkl"
+                },
+                {
+                    "img_path": "data/masks/A_3.png",
+                    "mask_path": "data/masks/A_3.pkl"
+                }
+            ],
+            "B": [
+                {
+                    "img_path": "data/masks/B.png",
+                    "mask_path": "data/masks/B.pkl"
+                },
+                {
+                    "img_path": "data/masks/B_2.png",
+                    "mask_path": "data/masks/B_2.pkl"
+                }
+            ],
+            "C": [
+                {
+                    "img_path": "data/masks/C.png",
+                    "mask_path": "data/masks/C.pkl"
+                },
+                {
+                    "img_path": "data/masks/C_2.png",
+                    "mask_path": "data/masks/C_2.pkl"
+                }
+            ]
+        }
+    }
+}
