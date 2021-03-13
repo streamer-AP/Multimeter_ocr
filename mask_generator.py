@@ -28,8 +28,8 @@ if __name__ == '__main__':
     detector=cv2.AKAZE_create()
     idx=0
     print(cfg)
+    dst=cv2.imread("data/masks/C.png")
     while(1):
-        ret, dst= camera()
 
         #dst = cv2.fastNlMeansDenoisingColored(frame,None,3,3,7,21)
         mask=np.zeros_like(dst[:,:,0])
@@ -52,9 +52,9 @@ if __name__ == '__main__':
         if k== ord('q'):
             break
         elif k==ord("s"):
-            with open(os.path.join(output_dir,f"{idx}.pkl"),"wb") as f:
-                pickle.dump({"mask":mask,"roi":[cfg["x2"],cfg["y2"],cfg["w2"],cfg["h2"]]},f)
-            cv2.imwrite(os.path.join(output_dir,f"{idx}.png"),dst)
+            with open(os.path.join(output_dir,f"C.pkl"),"wb") as f:
+                pickle.dump({"mask":mask,"roi":[cfg["x2"],cfg["y2"],cfg["w2"],cfg["h2"]],"knob":[cfg["x3"],cfg["y3"],cfg["r3"]]},f)
+            cv2.imwrite(os.path.join(output_dir,f"C.png"),dst)
             idx+=1
             print(idx)
     camera.release()

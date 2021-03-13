@@ -1,53 +1,71 @@
+# coding:utf-8
 import json
-import os
-import shutil
+import time
 
 import cv2
+import torch
+
+from torchvision.models import resnet18
+from torchvision.transforms import Compose, Resize, ToTensor
 
 from camera import Camera
 from cropper import Cropper
-from Reco_A import scan as scan_a
-from Reco_B import scan as scan_b
-from Reco_C import scan as scan_c
+from utils import get_digit_imgs,get_digits,get_unit  
+import base64
+import time
+with open("config.json", "r") as f:
+    cfg = json.load(f)
+    cropper_cfg = cfg["cropper"]
+    camera_cfg = cfg["camera"]
+    reco_cfg = cfg["reco"]
+    unit_cfg = cfg["unit"]
+    server_cfg = cfg["server"]
 
-scanner = {
-    "A": scan_a, "B": scan_b, "C": scan_c
-}
-if __name__ == "__main__":
-    output_dir = "data/output/B"
-    if os.path.exists(output_dir):
-        shutil.rmtree(output_dir)
-    os.makedirs(output_dir)
-    with open("config.json", "r") as f:
-        cfg = json.load(f)
-        cropper_cfg = cfg["cropper"]
-        camera_cfg = cfg["camera"]
     camera = Camera(camera_cfg)
     cropper = Cropper(cropper_cfg)
-    idx = 0
-    while(1):
+
+    if reco_cfg["model_name"] == "resnet18":
+        reco_model = resnet18(num_classes=reco_cfg["num_classes"])
+    reco_model.load_state_dict(torch.load(
+        reco_cfg["model_path"])["model_state_dict"])
+    reco_model.eval()
+
+    reco_char_dict = reco_cfg["char_dict"]
+    transform = ToTensor()
+
+    if unit_cfg["model_name"] == "resnet18":
+        unit_model = resnet18(num_classes=unit_cfg["num_classes"])
+    unit_model.eval()
+    unit_model.load_state_dict(torch.load(unit_cfg["model_path"])["model_state_dict"])
+    unit_char_dict = unit_cfg["char_dict"]
+    unit_transforms = Compose([Resize((unit_cfg["height"], unit_cfg["width"])), ToTensor()])
+    while True:
         ret, frame = camera()
         if ret:
-            status, panel_img, key, message = cropper(frame)
-            cv2.imshow("img", frame)
-            if status == 0:
-                cv2.imshow("panel", panel_img)
-                digits, debug_img = scanner[key](panel_img)
-                cv2.imshow("reco", debug_img)
+            cv2.imwrite("tmp.jpg",frame)
+            start=time.time()
+            print(ret)
+            digits=[],
+            unit="",
+            if ret:
+                status, panel_img,knob_img, key, message = cropper(frame)
+                digits = []
+                if status == 0 or status == 3:
+                    digit_imgs= get_digit_imgs(
+                        panel_img,reco_cfg[key]["top_ratio"],reco_cfg[key]["bottom_ratio"],reco_cfg[key]["pre_bbox"],reco_cfg[key]["pre_char_num"],reco_cfg[key]["pre_char_width"],reco_cfg[key]["pre_first_char_offset"])
+                    digits=get_digits(digit_imgs, reco_model, reco_char_dict)
+                    unit=get_unit(knob_img,unit_model,unit_transforms
+                    ,unit_char_dict)
                 print(digits)
+                print(unit)
             else:
-                print(message)
+                message="Camera error"
+            print(time.time()-start)
+            
+            img=base64.b64encode(frame.tostring()).decode("ascii")
+            result=json.dumps({"digit":digits,"unit":unit,"message":message,"img":img})
+            print(message)
+            cv2.imshow("frame",frame)
+            cv2.waitKey(0)
         else:
             break
-        k = cv2.waitKey(1)
-        if k == ord('q'):
-            break
-        elif k == ord("s"):
-            output_path = os.path.join(output_dir, key, f"{idx}.jpg")
-            if not os.path.exists(os.path.join(output_dir, key)):
-                os.makedirs(os.path.join(output_dir, key))
-            cv2.imwrite(output_path, panel_img)
-            print(f"image saved at {output_path}")
-            idx += 1
-    camera.release()
-    cv2.destroyAllWindows()

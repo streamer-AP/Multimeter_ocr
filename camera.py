@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
-
+from cropper import Cropper
+import threading
+import queue
 
 class Camera():
     def __init__(self, camera_cfg) -> None:
@@ -12,12 +14,17 @@ class Camera():
         self.cap.set(cv2.CAP_PROP_FPS, int(fps))
         self.origin_roi = origin_roi
         self.calibrated_roi = calibrated_roi
-        calibration = np.load("calibration.npy", allow_pickle=True)
+
+        calibration = np.load(calibration, allow_pickle=True)
         mtx = calibration[()]["mtx"]
         dist = calibration[()]["dist"]
         newcameramtx, roi = cv2.getOptimalNewCameraMatrix(
             mtx, dist, (origin_roi[2], origin_roi[3]), 1, (origin_roi[2], origin_roi[3]))
         self.mtx, self.dist, self.camerametx = mtx, dist, newcameramtx
+        self.q=queue.Queue()
+        # t=threading.Thread(target=self._reader)
+        # t.daemon=True
+        # t.start()
 
     def __call__(self,):
         ret, frame = self.cap.read()
@@ -30,40 +37,17 @@ class Camera():
                           self.calibrated_roi[0]:self.calibrated_roi[0]+self.calibrated_roi[2]]
         return ret, frame
 
+    def _reader(self):
+        while True:
+            ret, frame = self.cap.read()
+            if ret == 1:
+                if not self.q.empty():
+                    try:
+                        self.q.get_nowait()
+                    except:
+                        pass
+                self.q.put((ret,frame))
+            else:
+                break
     def release(self):
         self.cap.release()
-
-
-if __name__ == '__main__':
-    import json
-    import os
-
-    config_file_name = "config.json"
-    output_dir = "data/output/test/"
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    with open(config_file_name, "r") as f:
-        cfg = json.load(f)
-    camera_cfg = cfg["camera"]
-    camera = Camera(camera_cfg)
-    video_writer = cv2.VideoWriter('record_C.avi', cv2.VideoWriter_fourcc(*'MJPG'),camera_cfg["fps"],  (camera_cfg["width"], camera_cfg["height"]), )
-    idx = 0
-    while(1):
-        ret, frame = camera.cap.read()
-        if ret:
-            cv2.imshow("img", frame)
-            video_writer.write(frame)
-        else:
-            break
-        k = cv2.waitKey(1)
-        if k == ord('q'):
-            break
-        elif k == ord("s"):
-            output_path = os.path.join(output_dir, f"{idx}.jpg")
-            cv2.imwrite(output_path, frame)
-            print(f"image saved at {output_path}")
-
-            idx += 1
-    camera.release()
-    video_writer.release()
-    cv2.destroyAllWindows()

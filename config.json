@@ -1,10 +1,10 @@
 {
     "camera": {
-        "file_path": 0,
+        "file_path": "data/input/1-2.mp4",
         "width": 1280,
         "height": 720,
         "fps": 5,
-        "params": "calibration.npy",
+        "params": "models/calibration.npy",
         "origin_roi": [
             200,
             0,
@@ -19,41 +19,85 @@
         ]
     },
     "cropper": {
+        "level": 1,
         "masks": {
-            "A": [
-                {
+            "A": [{
                     "img_path": "data/masks/A.png",
                     "mask_path": "data/masks/A.pkl"
                 },
                 {
-                    "img_path": "data/masks/A_2.png",
-                    "mask_path": "data/masks/A_2.pkl"
-                },
-                {
-                    "img_path": "data/masks/A_3.png",
-                    "mask_path": "data/masks/A_3.pkl"
+                    "img_path": "data/masks/A.png",
+                    "mask_path": "data/masks/A.pkl"
                 }
             ],
             "B": [
+
                 {
                     "img_path": "data/masks/B.png",
                     "mask_path": "data/masks/B.pkl"
-                },
-                {
-                    "img_path": "data/masks/B_2.png",
-                    "mask_path": "data/masks/B_2.pkl"
                 }
             ],
-            "C": [
-                {
-                    "img_path": "data/masks/C.png",
-                    "mask_path": "data/masks/C.pkl"
-                },
-                {
-                    "img_path": "data/masks/C_2.png",
-                    "mask_path": "data/masks/C_2.pkl"
-                }
-            ]
+            "C": [{
+                "img_path": "data/masks/C.png",
+                "mask_path": "data/masks/C.pkl"
+            }]
         }
+    },
+    "reco": {
+        "model_name": "resnet18",
+        "model_path": "models/digit_model.pth",
+        "char_dict": ["-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "p0", "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "unknown"],
+        "num_classes": 22,
+        "A": {
+            "top_ratio": 0.1,
+            "bottom_ratio": 0.667,
+            "pre_bbox": [
+                [16, 1, 47, 78],
+                [63, 1, 47, 78],
+                [110, 1, 47, 78],
+                [157, 1, 47, 78]
+            ],
+            "pre_char_num": 4,
+            "pre_char_width": 50,
+            "pre_first_char_offset": 20
+        },
+        "B": {
+            "top_ratio": 0,
+            "bottom_ratio": 1,
+            "pre_bbox": [
+                [0, 0, 24, 44],
+                [24, 0, 24, 44],
+                [48, 0, 24, 44],
+                [72, 0, 24, 44]
+            ],
+            "pre_char_num": 4,
+            "pre_char_width": 25,
+            "pre_first_char_offset": 20
+        },
+        "C": {
+            "top_ratio": 0.3,
+            "bottom_ratio": 0.9,
+            "pre_bbox": [
+                [16, 1, 47, 78],
+                [63, 1, 47, 78],
+                [110, 1, 47, 78],
+                [157, 1, 47, 78]
+            ],
+            "pre_char_num": 4,
+            "pre_char_width": 50,
+            "pre_first_char_offset": 20
+        }
+    },
+    "unit": {
+        "model_name": "resnet18",
+        "model_path": "models/unit_model.pth",
+        "char_dict": ["A", "AAC", "ADC", "F", "HFE", "KOU", "MAAC", "MADC", "MOU", "MVDC", "NF", "OFF", "OU", "SHORT", "TEMP", "UA", "UADC", "UF", "VAC", "VDC"],
+        "num_classes": 20,
+        "height": 150,
+        "width": 150
+    },
+    "server": {
+        "host": "192.168.170.175",
+        "port": 8080
     }
 }
