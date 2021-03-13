@@ -1,8 +1,8 @@
-# 说明
+## 说明
 
 这是一共万用表识别程序，可以识别表的读数，单位，正负，小数点等。 目前支持三种型号的万用表。理论上可以支持数码管数字+圆盘旋钮结构的任意数码表。项目目标准确率98%。
 
-![示例](https://github.com/streamer-AP/Digital_Panel_OCR/edit/main/tmp.jpg)
+![image](https://github.com/streamer-AP/Digital_Panel_OCR/edit/main/tmp.jpg)
 
 
 ## 使用方法
@@ -31,7 +31,9 @@ python server.py
 
 ## 技术细节
 
-整体分为两部分：对齐+数字/单位识别。 对齐使用SIFT特征进行，将表与标准表对齐后在固定区域切分出表盘，屏幕。 数字/单位识别各使用一个resnet18进行。
+整体分为两部分：对齐+数字/单位识别。 对齐使用SIFT特征进行，将表与标准表对齐后在固定区域切分出表盘，屏幕。
+
+数字/单位识别各使用一个resnet18进行。
 
 ## 运行速度
 
