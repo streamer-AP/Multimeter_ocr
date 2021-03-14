@@ -2,7 +2,7 @@
 
 这是一共万用表识别程序，可以识别表的读数，单位，正负，小数点等。 目前支持三种型号的万用表。理论上可以支持数码管数字+圆盘旋钮结构的任意数码表。项目目标准确率98%。
 
-![image](https://github.com/streamer-AP/Digital_Panel_OCR/edit/main/tmp.jpg)
+![image](https://github.com/streamer-AP/Multimeter_ocr/blob/main/tmp.jpg)
 
 
 ## 使用方法
